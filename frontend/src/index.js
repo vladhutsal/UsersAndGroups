@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import GroupsList from './App'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import CreateGroup from './components/CreateGroup'
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <GroupsList />
+    <CreateGroup />
   </React.StrictMode>,
   document.getElementById('root')
 );

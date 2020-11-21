@@ -2,12 +2,41 @@ import React from 'react';
 
 
 const Actions = (props) => {
-  return(
-    <div className='row'>
-      <button className='btn btn-sm btn-info mr-2' id={ props.id }>Edit</button>
-      <button className='btn btn-sm btn-warning' id={ props.id }>Delet</button>
-    </div>
-  )
+  if (!props.edit) {
+    return(
+      <div className='row'>
+        <button
+          className='btn btn-sm btn-info mr-2'
+          id={ props.id }
+          onClick={ props.editGroup }>
+            Edit
+        </button>
+        <button
+          className='btn btn-sm btn-info'
+          id={ props.id }>
+            Delet
+        </button>
+      </div>
+  )}
+
+  else {
+    return(
+      <div className='row'>
+        <button
+          className='btn btn-sm btn-info mr-2'
+          id={ props.id }
+          onClick={ props.editGroup }>
+            Cancel
+        </button>
+        <button
+          className='btn btn-sm btn-info'
+          id={ props.id }
+          onClick={ props.save }>
+            Save
+        </button>
+      </div>
+    )
+  }
 }
 
 

@@ -22,11 +22,13 @@ def groups_list(request):
 
 @api_view(['POST'])
 def create_group(request):
-    serialized = GroupSerializer(data=request.POST)
-    if serialized.is_valid():
+    serialized = GroupSerializer(data=request.data)
+    if serialized.is_valid(raise_exception=True):
         serialized.save()
+        return Response(serialized.data, status=200)
 
-    return Response(serialized.data)
+    return Response({}, status=400)
+
 
 
 @api_view(['POST'])

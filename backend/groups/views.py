@@ -25,9 +25,21 @@ def create_group(request):
     serialized = GroupSerializer(data=request.data)
     if serialized.is_valid(raise_exception=True):
         serialized.save()
-        return Response(serialized.data, status=200)
+        return Response(serialized.data, status=201)
 
     return Response({}, status=400)
+
+
+@api_view(['POST'])
+def edit_group(request, id):
+    group_obj = get_object_or_404(Group, id=id)
+    serialized = GroupSerializer(data=request.data)
+    if serialized.is_valid(raise_exception=True):
+        group_obj.name = serialized.data.get('name')
+        group_obj.description = serialized.data.get('description')
+        return Response(serialized.data, status=201)
+
+    return Response({'Error'}, status=400)
 
 
 
@@ -72,20 +84,6 @@ def edit_user(request, username):
         'group_query': group_query
     }
     return render(request, 'edit_user.html', context)
-
-
-def edit_group(request, groupname):
-    group_obj = get_object_or_404(Group, groupname=groupname)
-    form = GroupForm(request.POST or None, instance=group_obj)
-    if form.is_valid():
-        form.save()
-        return redirect('groups:groups_list')
-
-    context = {
-        'form': form,
-        'group_obj': group_obj
-    }
-    return render(request, 'edit_group.html', context)
 
 
 def delete_user(request, username):

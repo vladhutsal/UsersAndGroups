@@ -2,41 +2,7 @@ import React from 'react';
 import Actions from './Actions';
 
 
-export default class GroupsList extends React.Component {
-    constructor(props) {
-      super(props);
-  }
-
-  render() {
-    return (
-      <div>
-        <table className="table mt-4">
-          <thead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Group</th>
-            <th scope="col">Description</th>
-            <th scope="col">Actions</th>
-          </tr>
-          </thead>
-          <tbody id='tBody'>
-            { this.props.groupsList.map(group => (
-              <GroupRow
-                key={ group.id }
-                group={ group }
-                handleRequest={ this.props.handleRequest }
-                updateGroupList={ this.props.updateGroupList }/>
-            ))}
-          </tbody>
-        </table>
-        <br />
-      </div>
-    )
-  }
-}
-
-
-class GroupRow extends React.Component {
+export default class GroupRow extends React.Component {
     constructor(props) {
       super(props);
 

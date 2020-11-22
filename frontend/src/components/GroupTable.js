@@ -1,6 +1,5 @@
 import React from 'react';
 import Actions from './Actions';
-import Cookies from 'js-cookie';
 
 
 export default class GroupsList extends React.Component {
@@ -22,7 +21,11 @@ export default class GroupsList extends React.Component {
           </thead>
           <tbody id='tBody'>
             { this.props.groupsList.map(group => (
-              <GroupRow key={ group.id } group={ group }/>
+              <GroupRow
+                key={ group.id }
+                group={ group }
+                handleRequest={ this.props.handleRequest }
+                updateGroupList={ this.props.updateGroupList }/>
             ))}
           </tbody>
         </table>
@@ -47,6 +50,7 @@ class GroupRow extends React.Component {
     this.editGroup = this.editGroup.bind(this);
     this.updateField = this.updateField.bind(this);
     this.saveEditedGroup = this.saveEditedGroup.bind(this);
+    this.deleteGroup = this.deleteGroup.bind(this);
   }
 
   updateField(event) {
@@ -62,26 +66,23 @@ class GroupRow extends React.Component {
     }));
   }
 
+  async deleteGroup() {
+    const url = `http://127.0.0.1:8000/api/groups/delete/${this.state.id}`
+    const res = await this.props.handleRequest(url, 'DELETE');
+    console.log(res.message);
+
+    this.props.updateGroupList('delete', this.state.id);
+  }
+
   async saveEditedGroup() {
-    const csrftoken = Cookies.get('csrftoken');
     const url = `http://127.0.0.1:8000/api/groups/edit/${this.state.id}`;
     const data = {
       name: this.state.name,
       description: this.state.description
     };
-
-    const request = {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken
-      }
-    };
-    const res = await fetch(url, request);
-    const resData = await res.json();
+    const { resData, status } = await this.props.handleRequest(url, 'POST', data);
     this.editGroup();
-    console.log(resData);
+    console.log('GroupTable response status: ' + status);
   }
 
   render() {
@@ -91,7 +92,11 @@ class GroupRow extends React.Component {
           <td>{ this.state.id }</td>
           <td>{ this.state.name }</td>
           <td>{ this.state.description }</td>
-          <td><Actions id={ this.props.group.id } editGroup={ this.editGroup } edit={ this.state.edit }/></td>
+          <td><Actions
+                id={ this.props.group.id }
+                editGroup={ this.editGroup }
+                edit={ this.state.edit }
+                delete={ this.deleteGroup }/></td>
         </tr>
       )}
 

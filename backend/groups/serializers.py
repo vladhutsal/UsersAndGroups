@@ -6,7 +6,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['name', 'group']
+        fields = ('name', 'group')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['name', 'created', 'group', 'group_name']
+        fields = ('name', 'created', 'group', 'group_name')
 
     def get_group_name(self, obj):
         group_id = obj.user_group
@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class GroupSerializer(serializers.ModelSerializer):
-
+    
     class Meta:
         model = Group
-        fields = ['name', 'description', 'id']
+        fields = ('id', 'name', 'description')

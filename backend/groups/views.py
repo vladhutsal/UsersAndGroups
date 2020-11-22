@@ -33,16 +33,23 @@ def create_group(request):
 @api_view(['POST'])
 def edit_group(request, id):
     group_obj = get_object_or_404(Group, id=id)
-    serialized = GroupSerializer(data=request.data)
+    serialized = GroupSerializer(group_obj, data=request.data)
     if serialized.is_valid(raise_exception=True):
-        group_obj.name = serialized.data.get('name')
-        group_obj.description = serialized.data.get('description')
+        serialized.save()
         return Response(serialized.data, status=201)
 
     return Response({'Error'}, status=400)
 
 
+@api_view(['DELETE'])
+def delete_group(request, id):
+    group_obj = get_object_or_404(Group, id=id)
+    group_obj.delete()
+    
+    return Response({'message': f'Group with id {id} was deleted'}, status=200)
 
+
+# Users views, need to separate
 @api_view(['POST'])
 def create_user(request):
     serialized = CreateUserSerializer(data=request.POST)
@@ -90,12 +97,6 @@ def delete_user(request, username):
     user_obj = get_object_or_404(User, username=username)
     user_obj.delete()
     return redirect('groups:users_list')
-
-
-def delete_group(request, groupname):
-    group_obj = get_object_or_404(Group, groupname=groupname)
-    group_obj.delete()
-    return redirect('groups:groups_list')
 
 
 def home_redirect(request):

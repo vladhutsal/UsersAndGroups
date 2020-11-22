@@ -36,7 +36,11 @@ class CreateGroup extends React.Component {
     const newGroup = await res.json();
     console.warn('NEW GROUP');
     console.log(newGroup);
-    this.props.addNewGroup(newGroup);
+    this.props.updateGroupList('add', newGroup);
+    this.setState({
+      name: '',
+      description: ''
+    });
   }
 
   

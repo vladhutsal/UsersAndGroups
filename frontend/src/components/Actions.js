@@ -11,9 +11,11 @@ const Actions = (props) => {
           onClick={ props.editGroup }>
             Edit
         </button>
+
         <button
           className='btn btn-sm btn-info'
-          id={ props.id }>
+          id={ props.id }
+          onClick={ props.delete }>
             Delet
         </button>
       </div>
@@ -28,6 +30,7 @@ const Actions = (props) => {
           onClick={ props.editGroup }>
             Cancel
         </button>
+
         <button
           className='btn btn-sm btn-info'
           id={ props.id }

@@ -1,15 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 
-from .models import User, Group
+from .models import Group
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .serializers import (
-    UserSerializer,
-    GroupSerializer,
-    CreateUserSerializer
-)
+from .serializers import GroupSerializer
 
 
 @api_view(['GET'])
@@ -45,59 +41,5 @@ def edit_group(request, id):
 def delete_group(request, id):
     group_obj = get_object_or_404(Group, id=id)
     group_obj.delete()
-    
+
     return Response({'message': f'Group with id {id} was deleted'}, status=200)
-
-
-# Users views, need to separate
-@api_view(['POST'])
-def create_user(request):
-    serialized = CreateUserSerializer(data=request.POST)
-    print(serialized)
-    if serialized.is_valid(raise_exception=True):
-        serialized.save()
-
-    return redirect('groups:users_list')
-
-
-@api_view(['GET'])
-def users_list(request):
-    users_list = User.objects.all()
-    groups = Group.objects.all()
-
-    context = {
-        'userlist': users_list,
-        'group_query': groups
-    }
-    return render(request, 'users_list.html', context)
-
-
-def edit_user(request, username):
-    user_obj = get_object_or_404(User, username=username)
-    username_form = UserForm(request.POST or None, instance=user_obj)
-    group_query = Group.objects.all()
-    if username_form.is_valid():
-        group_id = request.POST.get('group')
-        group = Group.objects.get(pk=group_id)
-
-        user_obj.username = username_form.cleaned_data.get('username')
-        user_obj.user_group = group
-        user_obj.save()
-        return redirect('groups:users_list')
-
-    context = {
-        'form': username_form,
-        'user_obj': user_obj,
-        'group_query': group_query
-    }
-    return render(request, 'edit_user.html', context)
-
-
-def delete_user(request, username):
-    user_obj = get_object_or_404(User, username=username)
-    user_obj.delete()
-    return redirect('groups:users_list')
-
-
-def home_redirect(request):
-    return redirect('groups:users_list')

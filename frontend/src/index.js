@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Groups from './Groups';
-import Navbar from './components/Nav'
+import { BrowserRouter } from 'react-router-dom';
+import HandleServer from './App';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <Navbar />
-    <Groups />
+    <BrowserRouter>
+      <HandleServer />
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );

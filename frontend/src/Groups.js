@@ -75,29 +75,26 @@ export default class Groups extends React.Component {
       <div>
         <CreateGroup 
         updateGroupList={ this.updateGroupList }/>
-
-        <div>
-          <table className="table mt-4">
-          <thead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Group</th>
-            <th scope="col">Description</th>
-            <th scope="col">Actions</th>
-          </tr>
-          </thead>
-          <tbody>
-            { this.state.groupsList.map(group => (
-            <GroupRow
-              key={ group.id }
-              group={ group }
-              handleRequest={ this.handleRequest }
-              updateGroupList={ this.updateGroupList }/>
-            ))}
-          </tbody>
-          </table>
+        <table className="table mt-4">
+        <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Group</th>
+          <th scope="col">Description</th>
+          <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+          { this.state.groupsList.map(object => (
+          <GroupRow
+            key={ object.id }
+            object={ object }
+            handleRequest={ this.handleRequest }
+            updateGroupList={ this.updateGroupList }/>
+          ))}
+        </tbody>
+        </table>
           <br />
-        </div>
       </div>
     )
   }

@@ -7,9 +7,9 @@ export default class GroupRow extends React.Component {
       super(props);
 
     this.state = {
-        id: props.group.id,
-        name: props.group.name,
-        description: props.group.description,
+        id: props.object.id,
+        name: props.object.name,
+        description: props.object.description,
         edit: false
     }
 
@@ -59,7 +59,7 @@ export default class GroupRow extends React.Component {
           <td>{ this.state.name }</td>
           <td>{ this.state.description }</td>
           <td><Actions
-                id={ this.props.group.id }
+                id={ this.state.id }
                 editGroup={ this.editGroup }
                 edit={ this.state.edit }
                 delete={ this.deleteGroup }/></td>

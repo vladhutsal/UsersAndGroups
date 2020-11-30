@@ -1,5 +1,5 @@
 import React from 'react';
-import Groups from './Groups';
+import Table from './Table';
 import Navbar from './components/Nav'
 import { Switch, Route, Redirect } from 'react-router-dom';
 
@@ -22,14 +22,14 @@ export default class HandleServer extends React.Component {
         <Navbar />
         <Switch>
           <Route exact path='/'>
-            <Redirect to="/users" />
+            <Redirect to="/groups" />
           </Route>
           <Route exact path='/groups' render={props =>
-            <Groups {...props} url={ GROUP_API_URL } />
+            <Table {...props} url={ GROUP_API_URL } />
           } />
 
           <Route exact path='/users' render={(props) =>
-            <Groups {...props} url={ USER_API_URL }/>
+            <Table {...props} url={ USER_API_URL }/>
           } />
         </Switch>
       </div>

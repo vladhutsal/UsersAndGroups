@@ -1,52 +1,27 @@
 import React from 'react';
-import CreateGroup from './components/CreateGroup';
 import TableRow from './components/TableRow';
-import Cookies from 'js-cookie';
+
 
 
 export default class Table extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      url: props.url,
       fetchedObjects: [],
       fieldNames: []
     }
-
-    this.handleRequest = this.handleRequest.bind(this);
-    this.updateFetchedObjects = this.updateFetchedObjects.bind(this);
     this.getFieldNames = this.getFieldNames.bind(this);
+    this.saveEditedRow = this.saveEditedRow.bind(this);
+    this.deleteRow = this.deleteRow.bind(this);
   }
-    
-
-  async handleRequest(url, method, data) {
-    if (['GET', 'DELETE'].includes(method)) {
-      const res = await fetch(url, { method: method });
-      const resData = await res.json();
-      return resData; 
-    }
-    else {
-      const csrftoken = Cookies.get('csrftoken');
-      const request = {
-        method: method,
-        body: JSON.stringify(data),
-        headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken
-        }
-      };
-
-      const res = await fetch(url, request);
-      const status = res.status;
-      const resData = await res.json();
-      return { resData, status };    
-  }};
 
 
   async componentDidMount() {
     const url = this.props.url;
-    const data = await this.handleRequest(url, 'GET');
+    const data = await this.props.handleRequest(url, 'GET');
     const names = this.getFieldNames(data[0]);
-
+    console.log(data)
     this.setState({
       fetchedObjects: data,
       fieldNames: names
@@ -64,56 +39,46 @@ export default class Table extends React.Component {
   }
 
 
-  updateFetchedObjects(action, groupData) {
-    if ('add'.includes(action)) {
-      this.setState(state => ({
-        fetchedObjects: [groupData, ...state.fetchedObjects]  
-      }));
-    }
+  async deleteRow(id) {
+    const url = `${this.state.url}/delete/${id}`
+    const res = await this.props.handleRequest(url, 'DELETE');
+    console.log(res.message);
 
-    else if ('delete'.includes(action)) {
-      const updatedArr = [...this.state.fetchedObjects];
-      const search = (group) => group.id === groupData;
-      const groupToDeleteId = updatedArr.findIndex(search);
-      updatedArr.splice(groupToDeleteId, 1);
+    this.props.updateFetchedObjects('delete', id);
+  }
 
-      this.setState({
-        fetchedObjects: updatedArr
-      });
-    };
+
+  async saveEditedRow(data, id) {
+    const url = `${this.state.url}/edit/${id}`;
+    const { status } = await this.props.handleRequest(url, 'POST', data);
+    return status;
   }
 
 
   render() {
     return (
-      <div>
-        <CreateGroup 
-          updateFetchedObjects={ this.updateFetchedObjects }
-        />
-        <table className="table mt-4">
+      <table className="table mt-4">
         <thead>
-        <tr>
-          { this.state.fieldNames.map(fieldName => (
-            <th scope='col' key={fieldName}>{ fieldName }</th>
-          ))}
-          <th scope='col'>Actions</th>
-        </tr>
+          <tr>
+            {this.state.fieldNames.map(fieldName => (
+              <th scope='col' key={fieldName}>{fieldName}</th>
+            ))}
+            <th scope='col'>Actions</th>
+          </tr>
         </thead>
         <tbody>
-          { this.state.fetchedObjects.map(object => (
+          {this.state.fetchedObjects.map(object => (
             <TableRow
-              key = { object.id }
-              object={ object }
-              handleRequest={ this.handleRequest }
-              updateFetchedObjects={ this.updateFetchedObjects }
-            /> 
+              key={object.id}
+              object={object}
+              saveEditedRow={this.saveEditedRow}
+              deleteRow={this.deleteRow}
+            />
           ))}
         </tbody>
-        </table>
-          <br />
-      </div>
+      </table>
     )
   }
-  
+
 
 }

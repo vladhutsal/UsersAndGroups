@@ -2,40 +2,41 @@ import React from 'react';
 
 
 const Actions = (props) => {
-  if (!props.edit) {
-    return(
+  if (!props.isEdit) {
+    return (
       <div className='row'>
         <button
           className='btn btn-sm btn-info mr-2'
-          id={ props.id }
-          onClick={ props.editGroup }>
-            Edit
+          id={props.id}
+          onClick={props.edit}>
+          Edit
         </button>
 
         <button
           className='btn btn-sm btn-info'
-          id={ props.id }
-          onClick={ props.delete }>
-            Delet
+          id={props.id}
+          onClick={props.delete}>
+          Delet
         </button>
       </div>
-  )}
+    )
+  }
 
   else {
-    return(
+    return (
       <div className='row'>
         <button
           className='btn btn-sm btn-info mr-2'
-          id={ props.id }
-          onClick={ props.editGroup }>
-            Cancel
+          id={props.id}
+          onClick={props.edit}>
+          Cancel
         </button>
 
         <button
           className='btn btn-sm btn-info'
-          id={ props.id }
-          onClick={ props.save }>
-            Save
+          id={props.id}
+          onClick={props.save}>
+          Save
         </button>
       </div>
     )

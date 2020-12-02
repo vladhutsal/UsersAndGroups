@@ -1,4 +1,3 @@
-import { get } from 'js-cookie';
 import React from 'react';
 
 
@@ -28,6 +27,7 @@ export default class CreationForm extends React.Component {
           handleRequest={this.props.handleRequest}
           updateFetchedObjects={this.props.updateFetchedObjects}
           url={this.state.url}
+          groupIdToName={this.props.groupIdToName}
         />
       )
     }
@@ -57,8 +57,8 @@ class CreateGroupForm extends React.Component {
 
   async submitNewGroup(event) {
     event.preventDefault();
-    this.props.handleRequest(`${this.props.url}/create`, 'POST', this.state);
-    this.props.updateFetchedObjects('add', this.state);
+    const newGroup = await this.props.handleRequest(`${this.props.url}/create`, 'POST', this.state);
+    this.props.updateFetchedObjects('add', newGroup);
 
     this.setState({
       name: '',
@@ -73,7 +73,7 @@ class CreateGroupForm extends React.Component {
         <form id='groupForm' onSubmit={this.submitNewGroup}>
           <input type='text' placeholder='name' name='name' onChange={this.updateField} value={this.state.name} />
           <input type='text' placeholder='description' name='description' onChange={this.updateField} value={this.state.description} />
-          <button className='btn btn-warning btn-sm' type='submit'>submit</button>
+          <button className='btn btn-warning btn-sm' type='submit'>Create group</button>
         </form>
       </div>
     )
@@ -86,29 +86,17 @@ class CreateUserForm extends React.Component {
     super(props)
     this.state = {
       name: '',
-      group: '',
-      groups: []
+      group: ''
     }
-
     this.submitNewUser = this.submitNewUser.bind(this);
     this.updateField = this.updateField.bind(this);
   }
-
-
-  async componentDidMount(){
-    const url = 'http://127.0.0.1:8000/api/groups';
-    const res = await this.props.handleRequest(url, 'GET');
-    this.setState({
-      groups: res
-    });
-  }
-
 
   updateField(event) {
     const { target: { name, value } } = event;
     this.setState({
       [name]: value
-    })
+    });
   }
 
   async submitNewUser(event) {
@@ -117,8 +105,8 @@ class CreateUserForm extends React.Component {
       name: this.state.name,
       group: this.state.group
     };
-    this.props.handleRequest(`${this.props.url}/create`, 'POST', data);
-    this.props.updateFetchedObjects('add', this.state);
+    const newUser = await this.props.handleRequest(`${this.props.url}/create`, 'POST', data);
+    this.props.updateFetchedObjects('add', newUser);
 
     this.setState({
       name: '',
@@ -126,18 +114,19 @@ class CreateUserForm extends React.Component {
     });
   }
 
-
   render() {
+    const groupKeys = Object.keys(this.props.groupIdToName);
     return (
       <div>
         <form id='userForm' onSubmit={this.submitNewUser}>
           <input type='text' placeholder='username' name='name' onChange={this.updateField} value={this.state.name} />
-          <select name='group'>
-            {this.state.groups.map(group => (
-              <option value={group.id}>{group.name}</option>
+          <select name='group' onChange={this.updateField}>
+            <option disabled selected>-- choose group --</option>
+            {groupKeys.map(groupId => (
+              <option key={groupId} value={groupId}>{this.props.groupIdToName[groupId]}</option>
             ))}
           </select>
-          <button className='btn btn-warning btn-sm' type='submit'>submit</button>
+          <button className='btn btn-warning btn-sm' type='submit'>Create user</button>
         </form>
       </div>
     )

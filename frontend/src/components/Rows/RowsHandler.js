@@ -47,13 +47,9 @@ export default class TableRow extends React.Component {
 
 
   render() {
-    const object = this.state.object;
-    const objKeys = Object.keys(object);
-    const objId = this.state.object.id;
-
     if (this.state.mode === 'groups') {
       return (
-        <GroupRow object={object}
+        <GroupRow group={this.state.object}
           editRow={this.editRow}
           saveRow={this.saveEditedRow}
           deleteRow={this.deleteRow}
@@ -64,11 +60,12 @@ export default class TableRow extends React.Component {
     }
     else if (this.state.mode === 'users') {
       return (
-        <UserRow object={object}
+        <UserRow user={this.state.object}
           editRow={this.editRow}
           saveRow={this.saveEditedRow}
           deleteRow={this.deleteRow}
           isEdit={this.state.edit}
+          groupIdToName={this.props.groupIdToName}
         />
       )
     }

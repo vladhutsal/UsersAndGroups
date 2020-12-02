@@ -36,6 +36,7 @@ export default class GroupsAndUsers extends React.Component {
           <Route exact path='/users' render={(props) => (
             <Table {...props}
               url={this.state.USER_API_URL}
+              grpUrl={this.state.GROUP_API_URL}
               handleRequest={this.handleRequest}
               updateFetchedObjects={this.updateFetchedObjects}
               mode='users'

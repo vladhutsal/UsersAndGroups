@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import CreateUserSerializer, UserSerializer
+from .serializers import UserSerializer
 from .models import User
 
 
@@ -13,38 +14,30 @@ def users_list(request):
     return Response(serialized.data, status=200)
 
 
-# @api_view(['POST'])
-# def create_user(request):
-#     serialized = CreateUserSerializer(data=request.POST)
-#     print(serialized)
-#     if serialized.is_valid(raise_exception=True):
-#         serialized.save()
+@api_view(['POST'])
+def create_user(request):
+    serialized = UserSerializer(data=request.data)
+    
+    if serialized.is_valid(raise_exception=True):
+        serialized.save()
 
-#     return redirect('groups:users_list')
-
-
-# def edit_user(request, username):
-#     user_obj = get_object_or_404(User, username=username)
-#     username_form = UserForm(request.POST or None, instance=user_obj)
-#     group_query = Group.objects.all()
-#     if username_form.is_valid():
-#         group_id = request.POST.get('group')
-#         group = Group.objects.get(pk=group_id)
-
-#         user_obj.username = username_form.cleaned_data.get('username')
-#         user_obj.user_group = group
-#         user_obj.save()
-#         return redirect('groups:users_list')
-
-#     context = {
-#         'form': username_form,
-#         'user_obj': user_obj,
-#         'group_query': group_query
-#     }
-#     return render(request, 'edit_user.html', context)
+    return Response(serialized.data, status=201)
 
 
-# def delete_user(request, username):
-#     user_obj = get_object_or_404(User, username=username)
-#     user_obj.delete()
-#     return redirect('groups:users_list')
+@api_view(['DELETE'])
+def delete_user(request, id):
+    user_obj = get_object_or_404(User, id=id)
+    user_obj.delete()
+    return Response({'message': f'User with id {id} was deleted'}, status=200)
+
+
+@api_view(['POST'])
+def edit_user(request, id):
+    user_obj = get_object_or_404(User, id=id)
+    serialized = UserSerializer(user_obj, request.data)
+
+    if serialized.is_valid(raise_exception=True):
+        serialized.save()
+        return Response(serialized.data, status=201)
+
+    return Response({'message': 'Something went wrong'}, status=500)

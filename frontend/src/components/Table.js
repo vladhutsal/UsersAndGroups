@@ -13,6 +13,7 @@ export default class Table extends React.Component {
       url: props.url,
       fetchedObjects: [],
       fieldNames: [],
+      groupIdToName: {}
     }
     this.getFieldNames = this.getFieldNames.bind(this);
     this.saveEditedRow = this.saveEditedRow.bind(this);
@@ -26,8 +27,18 @@ export default class Table extends React.Component {
   async componentDidMount() {
     const url = this.props.url;
     const data = await this.handleRequest(url, 'GET');
-    console.log(data)
+
     if (data.length > 0) {
+      if (this.state.mode === 'users') {
+        const groupArr = await this.handleRequest(this.props.grpUrl, 'GET');
+        const groups = {};
+        for (let group of groupArr) {
+          groups[group.id] = group.name;
+        };
+        this.setState({
+          groupIdToName: groups
+        });
+      }
       const names = this.getFieldNames(data[0]);
       this.setState({
         fetchedObjects: data,
@@ -103,8 +114,8 @@ export default class Table extends React.Component {
 
   async saveEditedRow(data, id) {
     const url = `${this.state.url}/edit/${id}`;
-    const { status } = await this.props.handleRequest(url, 'POST', data);
-    return status;
+    const resData = await this.props.handleRequest(url, 'POST', data);
+    return resData;
   }
 
 
@@ -116,6 +127,7 @@ export default class Table extends React.Component {
           url={this.state.url}
           handleRequest={this.handleRequest}
           mode={this.state.mode}
+          groupIdToName={this.state.groupIdToName}
         />
         <table className="table mt-4">
           <thead>
@@ -135,6 +147,7 @@ export default class Table extends React.Component {
                 updateFetchedObjects={this.updateFetchedObjects}
                 url={this.state.url}
                 mode={this.props.mode}
+                groupIdToName={this.state.groupIdToName}
               />
             ))}
           </tbody>

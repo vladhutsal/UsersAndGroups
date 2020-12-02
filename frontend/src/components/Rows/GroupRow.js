@@ -6,9 +6,9 @@ export default class GroupRow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: props.object.id,
-      name: props.object.name,
-      descr: props.object.description,
+      id: props.group.id,
+      name: props.group.name,
+      descr: props.group.description,
     }
     this.updateField = this.updateField.bind(this);
     this.collectData = this.collectData.bind(this);
@@ -32,18 +32,17 @@ export default class GroupRow extends React.Component {
   }
 
   render() {
-    const object = this.props.object;
-    const objKeys = Object.keys(object);
-    const objId = this.state.id;
+    const group = this.props.group;
+    const groupKeys = Object.keys(group);
     if (!this.props.isEdit) {
       return (
-        <tr key={object.name}>
-          { objKeys.map(fieldName => (
-            <td key={fieldName}>{object[fieldName]}</td>
+        <tr key={group.name}>
+          { groupKeys.map(fieldName => (
+            <td key={fieldName}>{group[fieldName]}</td>
           ))}
           <td>
             <Actions
-              id={objId}
+              id={this.state.id}
               edit={this.props.editRow}
               isEdit={this.props.isEdit}
               delete={this.props.deleteRow}
@@ -56,7 +55,7 @@ export default class GroupRow extends React.Component {
     else {
       return (
         <tr>
-          <td>{objId}</td>
+          <td>{this.state.id}</td>
           <td>
             <input className='form-control' name='name'
               value={this.state.name}

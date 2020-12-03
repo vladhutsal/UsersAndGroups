@@ -1,7 +1,7 @@
 import React from 'react';
 import RowsHandler from './Rows/RowsHandler';
 import Cookies from 'js-cookie';
-import CreationForm from './CreationForms'
+import CreationFormsHandler from './CreationFormsHandler'
 
 
 
@@ -9,16 +9,14 @@ export default class Table extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      mode: props.mode,
       url: props.url,
+      mode: props.mode,
+      groupIdToName: {},
+
       fetchedObjects: [],
-      fieldNames: [],
-      groupIdToName: {}
+      fieldNames: []
     }
     this.getFieldNames = this.getFieldNames.bind(this);
-    this.saveEditedRow = this.saveEditedRow.bind(this);
-    this.deleteRow = this.deleteRow.bind(this);
-
     this.handleRequest = this.handleRequest.bind(this);
     this.updateFetchedObjects = this.updateFetchedObjects.bind(this);
   }
@@ -64,11 +62,13 @@ export default class Table extends React.Component {
           'X-CSRFToken': csrftoken
         }
       };
-
       const res = await fetch(url, request);
-      const status = res.status;
-      const resData = await res.json();
-      return resData;
+      const response = {
+        status: res.status,
+        message: res.message,
+        data: await res.json()
+      };
+      return response;
     }
   };
 
@@ -82,7 +82,7 @@ export default class Table extends React.Component {
 
     else if (action === 'delete') {
       const updatedArr = [...this.state.fetchedObjects];
-      const search = (group) => group.id === objectData;
+      const search = (group) => group.id === objectData.id;
       const groupToDeleteId = updatedArr.findIndex(search);
       updatedArr.splice(groupToDeleteId, 1);
 
@@ -103,31 +103,16 @@ export default class Table extends React.Component {
   }
 
 
-  async deleteRow(id) {
-    const url = `${this.state.url}/delete/${id}`
-    const res = await this.props.handleRequest(url, 'DELETE');
-    console.log(res.message);
-
-    this.props.updateFetchedObjects('delete', id);
-  }
-
-
-  async saveEditedRow(data, id) {
-    const url = `${this.state.url}/edit/${id}`;
-    const resData = await this.props.handleRequest(url, 'POST', data);
-    return resData;
-  }
-
-
   render() {
     return (
       <>
-        <CreationForm
-          updateFetchedObjects={this.updateFetchedObjects}
+        <CreationFormsHandler
           url={this.state.url}
-          handleRequest={this.handleRequest}
           mode={this.state.mode}
           groupIdToName={this.state.groupIdToName}
+
+          handleRequest={this.handleRequest}
+          updateFetchedObjects={this.updateFetchedObjects}
         />
         <table className="table mt-4">
           <thead>
@@ -141,13 +126,13 @@ export default class Table extends React.Component {
           <tbody>
             {this.state.fetchedObjects.map(object => (
               <RowsHandler
-                key={object.id}
                 object={object}
-                handleRequest={this.handleRequest}
-                updateFetchedObjects={this.updateFetchedObjects}
                 url={this.state.url}
                 mode={this.props.mode}
                 groupIdToName={this.state.groupIdToName}
+
+                handleRequest={this.handleRequest}
+                updateFetchedObjects={this.updateFetchedObjects}
               />
             ))}
           </tbody>

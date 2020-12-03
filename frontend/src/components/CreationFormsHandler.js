@@ -1,39 +1,28 @@
 import React from 'react';
 
 
-export default class CreationForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      url: props.url,
-      mode: props.mode,
-      groups: props.groups
-    }
-  }
-
-  render() {
-    if (this.state.mode === 'groups') {
+export default function CreationFormsHandler(props) {
+    if (props.mode === 'groups') {
       return (
         <CreateGroupForm
-          handleRequest={this.props.handleRequest}
-          updateFetchedObjects={this.props.updateFetchedObjects}
-          url={this.state.url}
+          handleRequest={props.handleRequest}
+          updateFetchedObjects={props.updateFetchedObjects}
+          url={props.url}
         />
       )
     }
-    else if (this.state.mode === 'users') {
+    else if (props.mode === 'users') {
       return (
         <CreateUserForm
-          handleRequest={this.props.handleRequest}
-          updateFetchedObjects={this.props.updateFetchedObjects}
-          url={this.state.url}
-          groupIdToName={this.props.groupIdToName}
+          handleRequest={props.handleRequest}
+          updateFetchedObjects={props.updateFetchedObjects}
+          url={props.url}
+          groupIdToName={props.groupIdToName}
         />
       )
     }
 
   }
-}
 
 
 class CreateGroupForm extends React.Component {
@@ -57,8 +46,8 @@ class CreateGroupForm extends React.Component {
 
   async submitNewGroup(event) {
     event.preventDefault();
-    const newGroup = await this.props.handleRequest(`${this.props.url}/create`, 'POST', this.state);
-    this.props.updateFetchedObjects('add', newGroup);
+    const res = await this.props.handleRequest(`${this.props.url}/create`, 'POST', this.state);
+    this.props.updateFetchedObjects('add', res.data);
 
     this.setState({
       name: '',
@@ -116,12 +105,13 @@ class CreateUserForm extends React.Component {
 
   render() {
     const groupKeys = Object.keys(this.props.groupIdToName);
+    const placeholdeVal = '-- choose group --';
     return (
       <div>
         <form id='userForm' onSubmit={this.submitNewUser}>
           <input type='text' placeholder='username' name='name' onChange={this.updateField} value={this.state.name} />
-          <select name='group' onChange={this.updateField}>
-            <option disabled selected>-- choose group --</option>
+          <select name='group' onChange={this.updateField} defaultValue={placeholdeVal}>
+            <option disabled value={placeholdeVal}>{placeholdeVal}</option>
             {groupKeys.map(groupId => (
               <option key={groupId} value={groupId}>{this.props.groupIdToName[groupId]}</option>
             ))}

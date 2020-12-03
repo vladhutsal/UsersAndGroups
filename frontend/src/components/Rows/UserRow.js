@@ -9,11 +9,18 @@ export default class UserRow extends React.Component {
       name: props.user.name,
       groupId: props.user.group,
       groupIdToName: props.groupIdToName
-
     }
     this.updateField = this.updateField.bind(this);
     this.collectData = this.collectData.bind(this);
   }
+
+
+  editRow() {
+    this.setState(state => ({
+      edit: !state.edit
+    }));
+  }
+
 
   updateField(event) {
     const { target: { name, value } } = event;
@@ -27,7 +34,7 @@ export default class UserRow extends React.Component {
       name: this.state.name,
       group: this.state.groupId
     };
-    await this.props.saveRow(data, this.props.user.id);
+    await this.props.saveRow(data);
     this.props.editRow();
     return;
   }
@@ -69,8 +76,8 @@ export default class UserRow extends React.Component {
           </td>
           <td>{user.created}</td>
           <td>
-            <select name='groupId' onChange={this.updateField}>
-              <option disabled selected value={this.state.groupId}>{groupsIdToName[this.state.groupId]}</option>
+            <select name='groupId' onChange={this.updateField} value={this.state.groupId}>
+              <option disabled>{groupsIdToName[this.state.groupId]}</option>
               {groupKeys.map(groupId => (
                 <option key={groupId} value={groupId}>{groupsIdToName[groupId]}</option>
               ))}

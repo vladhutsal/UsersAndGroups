@@ -1,17 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import GroupRow from './GroupRow';
 import UserRow from './UserRow';
 
 
-export default class TableRow extends React.Component {
+export default class RowsHandler extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      id: props.object.id,
-      object: props.object,
-      mode: props.mode,
-      url: props.url,
       edit: false
     }
     this.editRow = this.editRow.bind(this);
@@ -26,46 +22,43 @@ export default class TableRow extends React.Component {
     }));
   }
 
-
   async deleteRow() {
-    const url = `${this.state.url}/delete/${this.state.id}`
+    const url = `${ this.props.url }/delete/${ this.props.object.id }`
     const res = await this.props.handleRequest(url, 'DELETE');
     console.log(res.message);
 
-    this.props.updateFetchedObjects('delete', this.state.id);
+    this.props.updateFetchedObjects('delete', this.props.object);
   }
 
 
-  async saveEditedRow(data, id) {
-    const url = `${this.state.url}/edit/${id}`;
-    const resData = await this.props.handleRequest(url, 'POST', data);
-    this.setState({
-      object: resData
-    })
+  async saveEditedRow(data) {
+    const url = `${ this.props.url }/edit/${ this.props.object.id }`;
+    const res = await this.props.handleRequest(url, 'POST', data);
     return;
   }
 
 
   render() {
-    if (this.state.mode === 'groups') {
+    if (this.props.mode === 'groups') {
       return (
-        <GroupRow group={this.state.object}
+        <GroupRow group={this.props.object}
+          isEdit={this.state.edit}
+
           editRow={this.editRow}
           saveRow={this.saveEditedRow}
           deleteRow={this.deleteRow}
-          isEdit={this.state.edit}
-
         />
       )
     }
-    else if (this.state.mode === 'users') {
+    else if (this.props.mode === 'users') {
       return (
-        <UserRow user={this.state.object}
+        <UserRow user={this.props.object}
+          isEdit={this.state.edit}
+          groupIdToName={this.props.groupIdToName}
+
           editRow={this.editRow}
           saveRow={this.saveEditedRow}
           deleteRow={this.deleteRow}
-          isEdit={this.state.edit}
-          groupIdToName={this.props.groupIdToName}
         />
       )
     }

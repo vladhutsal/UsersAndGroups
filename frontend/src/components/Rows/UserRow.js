@@ -6,69 +6,75 @@ export default class UserRow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: props.user.name,
-      groupId: props.user.group,
-      groupIdToName: props.groupIdToName
-    }
+      isEdit: false,
+      name: '',
+      group: ''
+    };
+    this.toogleEdit = this.toogleEdit.bind(this);
     this.updateField = this.updateField.bind(this);
     this.collectData = this.collectData.bind(this);
   }
 
 
-  editRow() {
+  toogleEdit() {
     this.setState(state => ({
-      edit: !state.edit
+      isEdit: !state.isEdit,
+      name: this.props.user.name,
+      group: this.props.user.group
     }));
   }
 
 
   updateField(event) {
     const { target: { name, value } } = event;
+    console.log(event.target.value)
     this.setState({
       [name]: value
     });
   }
 
+
   async collectData() {
     const data = {
       name: this.state.name,
-      group: this.state.groupId
+      group: this.state.group
     };
-    await this.props.saveRow(data);
-    this.props.editRow();
+    await this.props.saveEditedRow(data, this.props.user.id);
+    this.setState({
+      isEdit: false
+    });
     return;
   }
 
+
   render() {
     const user = this.props.user;
-    const userId = this.props.user.id;
-    const groupsIdToName = this.state.groupIdToName;
-    let groupKeys = Object.keys(this.state.groupIdToName);
-    groupKeys = groupKeys.filter(val => {return parseInt(val) !== this.state.groupId});
-
-    if (!this.props.isEdit) {
+    const groupsIdToName = this.props.groupsIdToName;
+    const groupKeys = Object.keys(groupsIdToName);
+    delete groupKeys[this.state.group];
+    if (!this.state.isEdit) {
       return (
-        <tr key={this.state.name}>
-          <td>{userId}</td>
+        <tr>
+          <td>{user.id}</td>
           <td>{user.name}</td>
           <td>{user.created}</td>
-          <td>{this.props.groupIdToName[this.state.groupId]}</td>
+          <td>{groupsIdToName[this.props.user.group]}</td>
           <td>
             <Actions
-              id={userId}
-              edit={this.props.editRow}
-              isEdit={this.props.isEdit}
+              id={user.id}
+              isEdit={this.state.isEdit}
               delete={this.props.deleteRow}
+              edit={this.toogleEdit}
             />
           </td>
         </tr>
       )
     }
 
-    else if (this.props.isEdit) {
+    else if (this.state.isEdit) {
       return (
         <tr>
-          <td>{userId}</td>
+          <td>{user.id}</td>
           <td>
             <input className='form-control' name='name'
               value={this.state.name}
@@ -76,18 +82,21 @@ export default class UserRow extends React.Component {
           </td>
           <td>{user.created}</td>
           <td>
-            <select name='groupId' onChange={this.updateField} value={this.state.groupId}>
-              <option disabled>{groupsIdToName[this.state.groupId]}</option>
+            <select name='group' onChange={this.updateField} value={this.state.group}>
+              <option disabled>{groupsIdToName[this.state.group]}</option>
               {groupKeys.map(groupId => (
                 <option key={groupId} value={groupId}>{groupsIdToName[groupId]}</option>
               ))}
             </select>
           </td>
-            <td><Actions
+          <td>
+            <Actions
               id={this.props.user.id}
-              edit={this.props.editRow}
-              isEdit={this.props.isEdit}
-              save={this.collectData} /></td>
+              isEdit={this.state.isEdit}
+              save={this.collectData}
+              edit={this.toogleEdit}
+            />
+          </td>
         </tr>
       )
     }

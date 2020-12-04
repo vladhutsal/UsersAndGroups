@@ -7,15 +7,13 @@ const Actions = (props) => {
       <div className='row'>
         <button
           className='btn btn-sm btn-info mr-2'
-          id={props.id}
           onClick={props.edit}>
           Edit
         </button>
 
         <button
           className='btn btn-sm btn-info'
-          id={props.id}
-          onClick={props.delete}>
+          onClick={() => {props.delete(props.id)}}>
           Delet
         </button>
       </div>
@@ -27,14 +25,12 @@ const Actions = (props) => {
       <div className='row'>
         <button
           className='btn btn-sm btn-info mr-2'
-          id={props.id}
           onClick={props.edit}>
           Cancel
         </button>
 
         <button
           className='btn btn-sm btn-info'
-          id={props.id}
           onClick={props.save}>
           Save
         </button>

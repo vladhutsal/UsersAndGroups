@@ -60,8 +60,14 @@ class CreateGroupForm extends React.Component {
     return (
       <div>
         <form id='groupForm' onSubmit={this.submitNewGroup}>
-          <input type='text' placeholder='name' name='name' onChange={this.updateField} value={this.state.name} />
-          <input type='text' placeholder='description' name='description' onChange={this.updateField} value={this.state.description} />
+          <div className='row my-2'>
+            <div className='col-3'>
+              <input className='form-control' type='text' placeholder='name' name='name' onChange={this.updateField} value={this.state.name} />
+            </div>
+            <div className='col-6'>
+              <input className='form-control' type='text' placeholder='description' name='description' onChange={this.updateField} value={this.state.description} />
+            </div>
+          </div>
           <button className='btn btn-warning btn-sm' type='submit'>Create group</button>
         </form>
       </div>
@@ -111,10 +117,10 @@ class CreateUserForm extends React.Component {
       <div>
         <form id='userForm' onSubmit={this.submitNewUser}>
           <div className='row my-2'>
-            <div className='col-4'>
+            <div className='col-3'>
               <input className='form-control' type='text' placeholder='username' name='name' onChange={this.updateField} value={this.state.name} />
             </div>
-            <div className='col-4'>
+            <div className='col-3'>
               <select className='form-control' name='group' onChange={this.updateField} defaultValue={placeholdeVal}>
                 <option disabled value={placeholdeVal}>{placeholdeVal}</option>
                 {groupKeys.map(groupId => (
@@ -122,8 +128,8 @@ class CreateUserForm extends React.Component {
                 ))}
               </select>
             </div>
-          <button className='btn btn-warning btn-sm' type='submit'>Create user</button>
           </div>
+          <button className='btn btn-warning btn-sm' type='submit'>Create user</button>
         </form>
       </div>
     )

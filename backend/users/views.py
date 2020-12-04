@@ -28,7 +28,13 @@ def create_user(request):
 def delete_user(request, id):
     user_obj = get_object_or_404(User, id=id)
     user_obj.delete()
-    return Response({'message': f'User with id {id} was deleted'}, status=200)
+
+    serialized = UserSerializer(user_obj)
+    response = {
+        'data': serialized.data,
+        'message': f'User with id {id} was deleted'
+    }
+    return Response(response, status=200)
 
 
 @api_view(['POST'])

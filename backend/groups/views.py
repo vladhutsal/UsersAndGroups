@@ -42,4 +42,10 @@ def delete_group(request, id):
     group_obj = get_object_or_404(Group, id=id)
     group_obj.delete()
 
-    return Response({'message': f'Group with id {id} was deleted'}, status=200)
+    serialized = GroupSerializer(group_obj)
+    response = {
+        'data': serialized.data,
+        'message': f'Group with id {id} was deleted'
+    }
+
+    return Response(response, status=200)

@@ -49,7 +49,7 @@ export default class GroupRow extends React.Component {
         <tr>
           <td>{group.id}</td>
           <td>{group.name}</td>
-          <td>{group.description}</td>
+          <td style={{'maxWidth': '150px'}}>{group.description}</td>
           <td>
             <Actions
               id={group.id}

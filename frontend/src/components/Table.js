@@ -1,7 +1,7 @@
 import React from 'react';
-import RowsHandler from './Rows/RowsHandler';
+import RowsHandler from './Handlers/RowsHandler';
 import Cookies from 'js-cookie';
-import CreationFormsHandler from './CreationFormsHandler'
+import CreationFormsHandler from '../components/Handlers/CreationFormsHandler'
 
 
 
@@ -11,10 +11,11 @@ export default class Table extends React.Component {
     this.state = {
       url: props.url,
       mode: props.mode,
-      groupIdToName: {},
-
+      
       fetchedObjects: [],
-      fieldNames: []
+      fieldNames: [],
+
+      groupsIdToName: {},
     }
     this.getFieldNames = this.getFieldNames.bind(this);
     this.handleRequest = this.handleRequest.bind(this);
@@ -34,7 +35,7 @@ export default class Table extends React.Component {
           groups[group.id] = group.name;
         };
         this.setState({
-          groupIdToName: groups
+          groupsIdToName: groups
         });
       }
       const names = this.getFieldNames(data[0]);
@@ -73,23 +74,28 @@ export default class Table extends React.Component {
   };
 
 
-  updateFetchedObjects(action, objectData) {
+  updateFetchedObjects(action, object) {
+    const updatedArr = [...this.state.fetchedObjects];
+    const search = (group) => group.id === object.id;
+    const currentObjId = updatedArr.findIndex(search);
+
     if (action === 'add') {
-      this.setState(state => ({
-        fetchedObjects: [objectData, ...state.fetchedObjects]
-      }));
+      updatedArr.unshift(object);
+    }
+
+    else if(action === 'edit') {
+      updatedArr[currentObjId] = object;
     }
 
     else if (action === 'delete') {
-      const updatedArr = [...this.state.fetchedObjects];
-      const search = (group) => group.id === objectData.id;
-      const groupToDeleteId = updatedArr.findIndex(search);
-      updatedArr.splice(groupToDeleteId, 1);
-
-      this.setState({
-        fetchedObjects: updatedArr
-      });
+      console.log(object)
+      updatedArr.splice(currentObjId, 1);
     };
+
+    this.setState({
+      fetchedObjects: updatedArr
+    });
+    console.log(this.state.fetchedObjects)
   }
 
 
@@ -109,7 +115,7 @@ export default class Table extends React.Component {
         <CreationFormsHandler
           url={this.state.url}
           mode={this.state.mode}
-          groupIdToName={this.state.groupIdToName}
+          groupsIdToName={this.state.groupsIdToName}
 
           handleRequest={this.handleRequest}
           updateFetchedObjects={this.updateFetchedObjects}
@@ -124,17 +130,15 @@ export default class Table extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.fetchedObjects.map(object => (
-              <RowsHandler
-                object={object}
-                url={this.state.url}
-                mode={this.props.mode}
-                groupIdToName={this.state.groupIdToName}
+            <RowsHandler
+              url={this.state.url}
+              mode={this.props.mode}
+              objects={this.state.fetchedObjects}
+              groupsIdToName={this.state.groupsIdToName}
 
-                handleRequest={this.handleRequest}
-                updateFetchedObjects={this.updateFetchedObjects}
-              />
-            ))}
+              handleRequest={this.handleRequest}
+              updateFetchedObjects={this.updateFetchedObjects}
+            />
           </tbody>
         </table>
       </>

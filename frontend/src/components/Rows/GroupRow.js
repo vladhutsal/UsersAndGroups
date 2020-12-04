@@ -6,11 +6,21 @@ export default class GroupRow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: props.group.name,
-      descr: props.group.description,
+      isEdit: false,
+      name: '',
+      descr: '',
     }
+    this.toogleEdit = this.toogleEdit.bind(this);
     this.updateField = this.updateField.bind(this);
     this.collectData = this.collectData.bind(this);
+  }
+
+  toogleEdit() {
+    this.setState(state => ({
+      isEdit: !state.isEdit,
+      name: this.props.group.name,
+      descr: this.props.group.description
+    }));
   }
 
   updateField(event) {
@@ -25,26 +35,26 @@ export default class GroupRow extends React.Component {
       name: this.state.name,
       description: this.state.descr
     };
-    await this.props.saveRow(data);
-    this.props.editRow();
+    await this.props.saveEditedRow(data, this.props.group.id);
+    this.setState({
+      isEdit: false
+    });
     return;
   }
 
   render() {
-    const groupId = this.props.group.id;
     const group = this.props.group;
-    const groupKeys = Object.keys(group);
-    if (!this.props.isEdit) {
+    if (!this.state.isEdit) {
       return (
-        <tr key={group.name}>
-          { groupKeys.map(fieldName => (
-            <td key={fieldName}>{group[fieldName]}</td>
-          ))}
+        <tr>
+          <td>{group.id}</td>
+          <td>{group.name}</td>
+          <td>{group.description}</td>
           <td>
             <Actions
-              id={groupId}
-              edit={this.props.editRow}
-              isEdit={this.props.isEdit}
+              id={group.id}
+              edit={this.toogleEdit}
+              isEdit={this.state.isEdit}
               delete={this.props.deleteRow}
             />
           </td>
@@ -54,8 +64,8 @@ export default class GroupRow extends React.Component {
 
     else {
       return (
-        <tr>
-          <td>{groupId}</td>
+        <tr key={group.name}>
+          <td>{group.id}</td>
           <td>
             <input className='form-control' name='name'
               value={this.state.name}
@@ -68,9 +78,9 @@ export default class GroupRow extends React.Component {
           </td>
           <td>
             <Actions
-              id={this.state.id}
-              edit={this.props.editRow}
-              isEdit={this.props.isEdit}
+              id={group.id}
+              edit={this.toogleEdit}
+              isEdit={this.state.isEdit}
               save={this.collectData} />
           </td>
         </tr>

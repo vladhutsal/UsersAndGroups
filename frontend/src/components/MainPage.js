@@ -1,11 +1,11 @@
 import React from 'react';
 import RowsHandler from './Handlers/RowsHandler';
 import Cookies from 'js-cookie';
-import CreationFormsHandler from '../components/Handlers/CreationFormsHandler'
+import CreationFormsHandler from './Handlers/CreationFormsHandler'
 
 
 
-export default class Table extends React.Component {
+export default class MainPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {

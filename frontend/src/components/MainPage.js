@@ -1,22 +1,29 @@
 import React from 'react';
-import RowsHandler from './Handlers/RowsHandler';
-import Cookies from 'js-cookie';
-import CreationFormsHandler from './Handlers/CreationFormsHandler'
 
+import PopUp from './PopUp';
+import RowsHandler from './Handlers/RowsHandler';
+import CreationFormsHandler from './Handlers/CreationFormsHandler';
+
+import Cookies from 'js-cookie';
 
 
 export default class MainPage extends React.Component {
   constructor(props) {
     super(props);
+    this.popUpRef = React.createRef();
     this.state = {
       url: props.url,
       mode: props.mode,
-      
+      showPopup: false,
+      popupData: {},
+
       fetchedObjects: [],
       fieldNames: [],
 
       groupsIdToName: {},
-    }
+    };
+    this.tooglePopup = this.tooglePopup.bind(this);
+    this.setData = this.setData.bind(this);
     this.getFieldNames = this.getFieldNames.bind(this);
     this.handleRequest = this.handleRequest.bind(this);
     this.updateFetchedObjects = this.updateFetchedObjects.bind(this);
@@ -53,6 +60,7 @@ export default class MainPage extends React.Component {
       const resData = await res.json();
       return resData;
     }
+
     else if (method === 'POST') {
       const csrftoken = Cookies.get('csrftoken');
       const request = {
@@ -83,19 +91,17 @@ export default class MainPage extends React.Component {
       updatedArr.unshift(object);
     }
 
-    else if(action === 'edit') {
+    else if (action === 'edit') {
       updatedArr[currentObjId] = object;
     }
 
     else if (action === 'delete') {
-      console.log(object)
       updatedArr.splice(currentObjId, 1);
     };
 
     this.setState({
       fetchedObjects: updatedArr
     });
-    console.log(this.state.fetchedObjects)
   }
 
 
@@ -108,18 +114,33 @@ export default class MainPage extends React.Component {
     return names;
   }
 
+  setData(data) {
+    this.setState({ popupData: data });
+    this.tooglePopup();
+  }
+
+  tooglePopup() {
+    this.setState(state => ({
+      showPopup: !state.showPopup,
+    }));
+  }
 
   render() {
     return (
       <>
+        <PopUp
+          show={this.state.showPopup}
+          tooglePopup={this.tooglePopup}
+          ref={this.popUpRef} 
+          data={this.state.popupData} />
+
         <CreationFormsHandler
           url={this.state.url}
           mode={this.state.mode}
           groupsIdToName={this.state.groupsIdToName}
-
           handleRequest={this.handleRequest}
-          updateFetchedObjects={this.updateFetchedObjects}
-        />
+          updateFetchedObjects={this.updateFetchedObjects} />
+
         <table className="table mt-4">
           <thead>
             <tr>
@@ -130,15 +151,17 @@ export default class MainPage extends React.Component {
             </tr>
           </thead>
           <tbody>
+
             <RowsHandler
               url={this.state.url}
               mode={this.props.mode}
               objects={this.state.fetchedObjects}
               groupsIdToName={this.state.groupsIdToName}
-
+              tooglePopup={this.tooglePopup}
+              setData={this.setData}
               handleRequest={this.handleRequest}
-              updateFetchedObjects={this.updateFetchedObjects}
-            />
+              updateFetchedObjects={this.updateFetchedObjects} />
+
           </tbody>
         </table>
       </>

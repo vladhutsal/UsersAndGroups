@@ -8,19 +8,19 @@ export default class RowsHandler extends React.Component {
     super(props);
 
     this.state = {
-      objects: []
+      objects: [],
     }
     this.deleteRow = this.deleteRow.bind(this);
     this.saveEditedRow = this.saveEditedRow.bind(this);
     this.deleteRow = this.deleteRow.bind(this);
   }
-  
+
 
   componentDidUpdate(prevProps) {
     if (this.props.objects !== prevProps.objects) {
       this.setState({
         objects: this.props.objects
-      })
+      });
     }
   }
 
@@ -28,9 +28,15 @@ export default class RowsHandler extends React.Component {
   async deleteRow(id) {
     const url = `${this.props.url}/delete/${id}`
     const res = await this.props.handleRequest(url, 'DELETE');
-    console.log(res.message);
     res.data.id = id;
     this.props.updateFetchedObjects('delete', res.data);
+
+    const data = {
+      action: `Deletion of ${res.data.name}`,
+      message: res.message
+    };
+
+    this.props.setData(data);
     return;
   }
 
@@ -42,6 +48,7 @@ export default class RowsHandler extends React.Component {
     return;
   }
 
+
   render() {
     if (this.props.mode === 'groups' && this.props.objects.length > 0) {
       return (
@@ -49,8 +56,8 @@ export default class RowsHandler extends React.Component {
           {this.state.objects.map(object => (
             <GroupRow group={object}
               key={object.id}
-              saveRow={this.saveEditedRow}
-              deleteRow={this.deleteRow}/>
+              saveEditedRow={this.saveEditedRow}
+              deleteRow={this.deleteRow} />
           ))}
         </>
       );
@@ -63,7 +70,7 @@ export default class RowsHandler extends React.Component {
               key={object.id}
               groupsIdToName={this.props.groupsIdToName}
               saveEditedRow={this.saveEditedRow}
-              deleteRow={this.deleteRow}/>
+              deleteRow={this.deleteRow} />
           ))}
         </>
       );
@@ -77,5 +84,5 @@ export default class RowsHandler extends React.Component {
       );
     }
 
-  }
+  };
 }

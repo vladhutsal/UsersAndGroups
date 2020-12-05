@@ -5,21 +5,21 @@ export default function CreationFormsHandler(props) {
   if (props.mode === 'groups') {
     return (
       <CreateGroupForm
+        url={props.url}
         handleRequest={props.handleRequest}
         updateFetchedObjects={props.updateFetchedObjects}
-        url={props.url}
       />
-    )
+    );
   }
   else if (props.mode === 'users') {
     return (
       <CreateUserForm
-        handleRequest={props.handleRequest}
-        updateFetchedObjects={props.updateFetchedObjects}
         url={props.url}
         groupsIdToName={props.groupsIdToName}
+        handleRequest={props.handleRequest}
+        updateFetchedObjects={props.updateFetchedObjects}
       />
-    )
+    );
   }
 
 }
@@ -41,13 +41,13 @@ class CreateGroupForm extends React.Component {
     const { target: { name, value } } = event;
     this.setState({
       [name]: value
-    })
+    });
   }
 
   async submitNewGroup(event) {
     event.preventDefault();
     const res = await this.props.handleRequest(`${this.props.url}/create`, 'POST', this.state);
-    this.props.updateFetchedObjects('add', res.data);
+    this.props.updateFetchedObjects('add', res);
 
     this.setState({
       name: '',
@@ -71,7 +71,7 @@ class CreateGroupForm extends React.Component {
           <button className='btn btn-warning btn-sm' type='submit'>Create group</button>
         </form>
       </div>
-    )
+    );
   }
 }
 
@@ -82,7 +82,7 @@ class CreateUserForm extends React.Component {
     this.state = {
       name: '',
       group: ''
-    }
+    };
     this.submitNewUser = this.submitNewUser.bind(this);
     this.updateField = this.updateField.bind(this);
   }
@@ -101,7 +101,7 @@ class CreateUserForm extends React.Component {
       group: this.state.group
     };
     const res = await this.props.handleRequest(`${this.props.url}/create`, 'POST', data);
-    this.props.updateFetchedObjects('add', res.data);
+    this.props.updateFetchedObjects('add', res);
 
     this.setState({
       name: '',
@@ -132,6 +132,6 @@ class CreateUserForm extends React.Component {
           <button className='btn btn-warning btn-sm' type='submit'>Create user</button>
         </form>
       </div>
-    )
+    );
   }
 }

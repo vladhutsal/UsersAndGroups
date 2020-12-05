@@ -29,14 +29,8 @@ export default class RowsHandler extends React.Component {
     const url = `${this.props.url}/delete/${id}`
     const res = await this.props.handleRequest(url, 'DELETE');
     res.data.id = id;
-    this.props.updateFetchedObjects('delete', res.data);
+    this.props.updateFetchedObjects('delete', res);
 
-    const data = {
-      action: `Deletion of ${res.data.name}`,
-      message: res.message
-    };
-
-    this.props.setData(data);
     return;
   }
 
@@ -44,45 +38,42 @@ export default class RowsHandler extends React.Component {
   async saveEditedRow(data, id) {
     const url = `${this.props.url}/edit/${id}`;
     const res = await this.props.handleRequest(url, 'POST', data);
-    this.props.updateFetchedObjects('edit', res.data)
+    this.props.updateFetchedObjects('edit', res)
+
     return;
   }
 
 
   render() {
-    if (this.props.mode === 'groups' && this.props.objects.length > 0) {
-      return (
-        <>
-          {this.state.objects.map(object => (
+    const mode = this.props.mode;
+    const dataLength = this.props.objects.length;
+    return (
+      <>
+        { mode === 'groups' && dataLength > 0 &&
+          this.state.objects.map(object => (
             <GroupRow group={object}
               key={object.id}
               saveEditedRow={this.saveEditedRow}
               deleteRow={this.deleteRow} />
-          ))}
-        </>
-      );
-    }
-    else if (this.props.mode === 'users' && this.props.objects.length > 0) {
-      return (
-        <>
-          {this.props.objects.map(object => (
+          ))
+        }
+
+        { mode === 'users' && dataLength > 0 &&
+          this.props.objects.map(object => (
             <UserRow user={object}
               key={object.id}
               groupsIdToName={this.props.groupsIdToName}
               saveEditedRow={this.saveEditedRow}
               deleteRow={this.deleteRow} />
-          ))}
-        </>
-      );
-    }
+          ))
+        }
 
-    else {
-      return (
-        <tr>
-          <td>Sorry, there is no data. Add something to see the table</td>
-        </tr>
-      );
-    }
-
+        { dataLength <= 0 &&
+          <tr>
+            <td>Sorry, there is no data. Add something to see the table</td>
+          </tr>
+        }
+      </>
+    )
   };
 }

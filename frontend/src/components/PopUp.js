@@ -6,25 +6,48 @@ import '../index.css';
 
 
 export default class PopUp extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      show: false
+    };
+    this.handleClose = this.handleClose.bind(this);
+  }
+
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.data !== this.props.data) {
+      this.setState({
+        show: false
+      });
+      this.handleClose();
+    }
+  }
   
+
+  handleClose() {
+    this.setState(state => ({
+      show: !state.show
+    }));
+  }
+ 
+
   render() {
-    const action = this.props.data.action;
-    const message = this.props.data.message;
     return (
       <Toast
-        ref={this.props.popUpRef}
         autohide={true}
+        animation={false}
         delay={3000}
-        show={this.props.show}
+        show={this.state.show}
         className='PopUp'
-        onClose={this.props.tooglePopup}
+        onClose={this.handleClose}
       >
         <ToastHeader closeButton={false}>
-          <strong className="mr-auto">{action}</strong>
+          <strong className="mr-auto">{this.props.data.eventName}</strong>
         </ToastHeader>
-        <ToastBody>{message}</ToastBody>
+        <ToastBody>{this.props.data.message}</ToastBody>
       </Toast>
-    )
+    );
   }
 }
   

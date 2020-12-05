@@ -10,18 +10,28 @@ from .models import User
 def users_list(request):
     users_qs = User.objects.all()
     serialized = UserSerializer(users_qs, many=True)
+    response = {
+        'data': serialized.data,
+        'message': 'All good'
+    }
 
-    return Response(serialized.data, status=200)
+    return Response(response, status=200)
 
 
 @api_view(['POST'])
 def create_user(request):
     serialized = UserSerializer(data=request.data)
-    
+
     if serialized.is_valid(raise_exception=True):
         serialized.save()
+        name = serialized.data['name']
+        response = {
+            'data': serialized.data,
+            'message': f'User {name} was created'
+        }
+        return Response(response, status=201)
 
-    return Response(serialized.data, status=201)
+    return Response({'message': 'Already exist'}, status=409)
 
 
 @api_view(['DELETE'])
@@ -32,7 +42,7 @@ def delete_user(request, id):
     serialized = UserSerializer(user_obj)
     response = {
         'data': serialized.data,
-        'message': f'User with id {id} was deleted'
+        'message': f'User {user_obj.name} was deleted'
     }
     return Response(response, status=200)
 
@@ -44,6 +54,10 @@ def edit_user(request, id):
 
     if serialized.is_valid(raise_exception=True):
         serialized.save()
-        return Response(serialized.data, status=201)
+        response = {
+            'data': serialized.data,
+            'message': f'User {user_obj.name} was edited'
+        }
+        return Response(response, status=201)
 
     return Response({'message': 'Something went wrong'}, status=500)

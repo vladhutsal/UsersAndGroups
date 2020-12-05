@@ -10,21 +10,17 @@ import Cookies from 'js-cookie';
 export default class MainPage extends React.Component {
   constructor(props) {
     super(props);
-    this.popUpRef = React.createRef();
     this.state = {
       url: props.url,
       mode: props.mode,
-      showPopup: false,
-      popupData: {},
+      popUpData: {},
 
       fetchedObjects: [],
       fieldNames: [],
 
       groupsIdToName: {},
     };
-    this.tooglePopup = this.tooglePopup.bind(this);
-    this.setData = this.setData.bind(this);
-    this.getFieldNames = this.getFieldNames.bind(this);
+    this.generatePopUpMessage = this.generatePopUpMessage.bind(this);
     this.handleRequest = this.handleRequest.bind(this);
     this.updateFetchedObjects = this.updateFetchedObjects.bind(this);
   }
@@ -32,13 +28,15 @@ export default class MainPage extends React.Component {
 
   async componentDidMount() {
     const url = this.props.url;
-    const data = await this.handleRequest(url, 'GET');
+    const response = await this.handleRequest(url, 'GET');
+    const data = response.data;
 
     if (data.length > 0) {
       if (this.state.mode === 'users') {
-        const groupArr = await this.handleRequest(this.props.grpUrl, 'GET');
+        const response = await this.handleRequest(this.props.grpUrl, 'GET');
+
         const groups = {};
-        for (let group of groupArr) {
+        for (let group of response.data) {
           groups[group.id] = group.name;
         };
         this.setState({
@@ -55,10 +53,18 @@ export default class MainPage extends React.Component {
 
 
   async handleRequest(url, method, data) {
+    const generateResponse = async (res) => {
+      const parsed = await res.json()
+      return {
+        status: res.status,
+        message: parsed.message,
+        data: parsed.data
+      };
+    }
+
     if (['GET', 'DELETE'].includes(method)) {
       const res = await fetch(url, { method: method });
-      const resData = await res.json();
-      return resData;
+      return generateResponse(res);
     }
 
     else if (method === 'POST') {
@@ -72,68 +78,79 @@ export default class MainPage extends React.Component {
         }
       };
       const res = await fetch(url, request);
-      const response = {
-        status: res.status,
-        message: res.message,
-        data: await res.json()
-      };
-      return response;
+      return generateResponse(res);
     }
   };
 
 
-  updateFetchedObjects(action, object) {
+  generatePopUpMessage(action, message) {
+    this.setState({
+      popUpData: {
+        eventName: this.capitalize(action),
+        message: message
+      }
+    });
+  }
+
+
+  updateFetchedObjects(action, response) {
+    if (response.status === 409) {
+      this.generatePopUpMessage(action, response.message);
+      return;
+    }
+
+    const object = response.data;
     const updatedArr = [...this.state.fetchedObjects];
     const search = (group) => group.id === object.id;
     const currentObjId = updatedArr.findIndex(search);
 
-    if (action === 'add') {
-      updatedArr.unshift(object);
-    }
+    switch(action) {
+      case 'add':
+        updatedArr.unshift(object);
+        break;
 
-    else if (action === 'edit') {
-      updatedArr[currentObjId] = object;
-    }
+      case 'edit':
+        updatedArr[currentObjId] = object;
+        break;
 
-    else if (action === 'delete') {
-      updatedArr.splice(currentObjId, 1);
+      case 'delete':
+        updatedArr.splice(currentObjId, 1);
+        break;
+
+      default:
+        console.warn('Wrong action for updateFetchedObjects method');
+        return;
     };
 
     this.setState({
       fetchedObjects: updatedArr
     });
+
+    this.generatePopUpMessage(action, response.message)
   }
 
 
-  getFieldNames(object) {
+  getFieldNames = (object) => {
     const names = [];
     for (let key of Object.keys(object)) {
-      let name = key.charAt(0).toUpperCase() + key.slice(1);
+      let name = this.capitalize(key);
       names.push(name);
     };
     return names;
   }
 
-  setData(data) {
-    this.setState({ popupData: data });
-    this.tooglePopup();
+
+  capitalize = (word) => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
   }
 
-  tooglePopup() {
-    this.setState(state => ({
-      showPopup: !state.showPopup,
-    }));
-  }
 
   render() {
     return (
       <>
         <PopUp
-          show={this.state.showPopup}
-          tooglePopup={this.tooglePopup}
-          ref={this.popUpRef} 
-          data={this.state.popupData} />
-
+          data={this.state.popUpData}
+        />
         <CreationFormsHandler
           url={this.state.url}
           mode={this.state.mode}
@@ -157,8 +174,6 @@ export default class MainPage extends React.Component {
               mode={this.props.mode}
               objects={this.state.fetchedObjects}
               groupsIdToName={this.state.groupsIdToName}
-              tooglePopup={this.tooglePopup}
-              setData={this.setData}
               handleRequest={this.handleRequest}
               updateFetchedObjects={this.updateFetchedObjects} />
 

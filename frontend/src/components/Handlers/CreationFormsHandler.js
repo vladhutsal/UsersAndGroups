@@ -62,10 +62,20 @@ class CreateGroupForm extends React.Component {
         <form id='groupForm' onSubmit={this.submitNewGroup}>
           <div className='row my-2'>
             <div className='col-3'>
-              <input className='form-control' type='text' placeholder='name' name='name' onChange={this.updateField} value={this.state.name} />
+              <input required
+                className='form-control'
+                placeholder='name'
+                name='name'
+                onChange={this.updateField}
+                value={this.state.name} />
             </div>
             <div className='col-6'>
-              <input className='form-control' type='text' placeholder='description' name='description' onChange={this.updateField} value={this.state.description} />
+              <input 
+                className='form-control'
+                placeholder='description'
+                name='description'
+                onChange={this.updateField}
+                value={this.state.description} />
             </div>
           </div>
           <button className='btn btn-warning btn-sm' type='submit'>Create group</button>
@@ -104,8 +114,7 @@ class CreateUserForm extends React.Component {
     this.props.updateFetchedObjects('add', res);
 
     this.setState({
-      name: '',
-      group: ''
+      name: ''
     });
   }
 
@@ -118,18 +127,33 @@ class CreateUserForm extends React.Component {
         <form id='userForm' onSubmit={this.submitNewUser}>
           <div className='row my-2'>
             <div className='col-3'>
-              <input className='form-control' type='text' placeholder='username' name='name' onChange={this.updateField} value={this.state.name} />
+              <input required
+                className='form-control'
+                name='name'
+                placeholder='username'
+                onChange={this.updateField}
+                value={this.state.name} />
             </div>
             <div className='col-3'>
-              <select className='form-control' name='group' onChange={this.updateField} defaultValue={placeholdeVal}>
-                <option disabled value={placeholdeVal}>{placeholdeVal}</option>
+              <select required
+                className='form-control'
+                name='group'
+                onChange={this.updateField}
+                defaultValue='' >
+                <option hidden value="">{placeholdeVal}</option>
                 {groupKeys.map(groupId => (
-                  <option key={groupId} value={groupId}>{this.props.groupsIdToName[groupId]}</option>
+                  <option key={groupId} value={groupId}>
+                    {this.props.groupsIdToName[groupId]}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
-          <button className='btn btn-warning btn-sm' type='submit'>Create user</button>
+          <button
+            className='btn btn-warning btn-sm'
+            type='submit'>
+              Create user
+          </button>
         </form>
       </div>
     );

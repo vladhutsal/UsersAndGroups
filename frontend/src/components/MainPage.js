@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PopUp from './PopUp';
-import RowsHandler from './Handlers/RowsHandler';
+import TableHandler from './Handlers/TableHandler';
 import CreationFormsHandler from './Handlers/CreationFormsHandler';
 
 import Cookies from 'js-cookie';
@@ -16,8 +16,6 @@ export default class MainPage extends React.Component {
       popUpData: {},
 
       fetchedObjects: [],
-      fieldNames: [],
-
       groupsIdToName: {},
     };
     this.generatePopUpMessage = this.generatePopUpMessage.bind(this);
@@ -31,24 +29,21 @@ export default class MainPage extends React.Component {
     const response = await this.handleRequest(url, 'GET');
     const data = response.data;
 
-    if (data.length > 0) {
-      if (this.state.mode === 'users') {
-        const response = await this.handleRequest(this.props.grpUrl, 'GET');
+    if (this.state.mode === 'users') {
+      const response = await this.handleRequest(this.props.grpUrl, 'GET');
 
-        const groups = {};
-        for (let group of response.data) {
-          groups[group.id] = group.name;
-        };
-        this.setState({
-          groupsIdToName: groups
-        });
-      }
-      const names = this.getFieldNames(data[0]);
+      const groups = {};
+      for (let group of response.data) {
+        groups[group.id] = group.name;
+      };
       this.setState({
-        fetchedObjects: data,
-        fieldNames: names
+        groupsIdToName: groups
       });
     }
+    
+    this.setState({
+      fetchedObjects: data,
+    });
   }
 
 
@@ -86,7 +81,7 @@ export default class MainPage extends React.Component {
   generatePopUpMessage(action, message) {
     this.setState({
       popUpData: {
-        eventName: this.capitalize(action),
+        eventName: action.charAt(0).toUpperCase() + action.slice(1),
         message: message
       }
     });
@@ -104,7 +99,7 @@ export default class MainPage extends React.Component {
     const search = (group) => group.id === object.id;
     const currentObjId = updatedArr.findIndex(search);
 
-    switch(action) {
+    switch (action) {
       case 'add':
         updatedArr.unshift(object);
         break;
@@ -129,22 +124,6 @@ export default class MainPage extends React.Component {
     this.generatePopUpMessage(action, response.message)
   }
 
-
-  getFieldNames = (object) => {
-    const names = [];
-    for (let key of Object.keys(object)) {
-      let name = this.capitalize(key);
-      names.push(name);
-    };
-    return names;
-  }
-
-
-  capitalize = (word) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  }
-
-
   render() {
     return (
       <>
@@ -158,27 +137,13 @@ export default class MainPage extends React.Component {
           handleRequest={this.handleRequest}
           updateFetchedObjects={this.updateFetchedObjects} />
 
-        <table className="table mt-4">
-          <thead>
-            <tr>
-              {this.state.fieldNames.map(fieldName => (
-                <th scope='col' key={fieldName}>{fieldName}</th>
-              ))}
-              <th scope='col'>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-
-            <RowsHandler
-              url={this.state.url}
-              mode={this.props.mode}
-              objects={this.state.fetchedObjects}
-              groupsIdToName={this.state.groupsIdToName}
-              handleRequest={this.handleRequest}
-              updateFetchedObjects={this.updateFetchedObjects} />
-
-          </tbody>
-        </table>
+        <TableHandler
+          url={this.state.url}
+          mode={this.props.mode}
+          objects={this.state.fetchedObjects}
+          groupsIdToName={this.state.groupsIdToName}
+          handleRequest={this.handleRequest}
+          updateFetchedObjects={this.updateFetchedObjects} />
       </>
     )
   }

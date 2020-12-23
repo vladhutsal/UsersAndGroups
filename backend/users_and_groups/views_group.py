@@ -1,10 +1,14 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 
 from .models import Group
 from .serializers import GroupSerializer
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+
+def index(request):
+    return render(request, "build/index.html")
 
 
 @api_view(['GET'])

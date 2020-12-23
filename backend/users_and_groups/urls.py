@@ -2,7 +2,6 @@ from django.urls import path
 from . import views_group
 from . import views_user
 
-app_name = 'users_and_groups'
 
 urlpatterns = [
     path('groups/', views_group.groups_list),
@@ -13,5 +12,7 @@ urlpatterns = [
     path('users/', views_user.users_list),
     path('users/create', views_user.create_user),
     path('users/delete/<int:id>', views_user.delete_user),
-    path('users/edit/<int:id>', views_user.edit_user)
+    path('users/edit/<int:id>', views_user.edit_user),
+
+    path('/', views_group.index)
 ]

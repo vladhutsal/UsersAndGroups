@@ -1,7 +1,9 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 
 from .models import Group
 from .serializers import GroupSerializer
+
+from django.db.models import ProtectedError
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -58,12 +60,14 @@ def edit_group(request, id):
 @api_view(['DELETE'])
 def delete_group(request, id):
     group_obj = get_object_or_404(Group, id=id)
-    group_obj.delete()
-
     serialized = GroupSerializer(group_obj)
-    response = {
-        'data': serialized.data,
-        'message': f'Group with name {group_obj.name} was deleted'
-    }
+    data = serialized.data
+    try:
+        group_obj.delete()
+        message = f'Group with name {group_obj.name} was deleted'
+        status = 200
+    except ProtectedError:
+        status = 409
+        message = f'Can`t delete non-empty group {group_obj.name}'
 
-    return Response(response, status=200)
+    return Response({'message': message, 'data': data}, status=status)

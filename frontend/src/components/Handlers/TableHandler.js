@@ -45,7 +45,6 @@ export default class TableHandler extends React.Component {
     const res = await this.props.handleRequest(url, 'DELETE');
     res.data.id = id;
     this.props.updateFetchedObjects('delete', res);
-
     return;
   }
 

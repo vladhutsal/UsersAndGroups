@@ -89,7 +89,7 @@ export default class MainPage extends React.Component {
 
 
   updateFetchedObjects(action, response) {
-    if (response.status === 409) {
+    if (![200, 201].includes(response.status)) {
       this.generatePopUpMessage(action, response.message);
       return;
     }
@@ -112,6 +112,7 @@ export default class MainPage extends React.Component {
         updatedArr.splice(currentObjId, 1);
         break;
 
+// for development only:
       default:
         console.warn('Wrong action for updateFetchedObjects method');
         return;
